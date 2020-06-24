@@ -26,6 +26,15 @@ connect.then((db) => {
 
 var app = express();
 
+app.all('*', (req, res, next) => {
+  if(req.secure) {
+    return req.next();
+  }
+  else {
+    res.redirect(307, 'https://' + req.hostname + ':' + app.get('secPort') + req.url);
+  }
+})
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
@@ -33,14 +42,6 @@ app.set('view engine', 'jade');
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-//app.use(cookieParser('12345-67890-09876-54321'));
-// app.use(session({
-//   name: 'session-id',
-//   secret: '12345-67890-09876-54321',
-//   saveUninitialized: false,
-//   resave: false,
-//   store: new FileStore()
-// }));
 
 app.use(passport.initialize());
 
